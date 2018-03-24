@@ -69,25 +69,25 @@ class Pathfinder:
                         selected_goal = (y, x)
         return selected_goal
 
-        def get_homebase_goal_safe(self, start):
-            graph = self.create_graph_safe(self.game_map)
-            size_x = len(self.game_map[0])
-            size_y = len(self.game_map)
+    def get_homebase_goal_safe(self, start):
+        graph = self.create_graph_safe(self.game_map)
+        size_x = len(self.game_map[0])
+        size_y = len(self.game_map)
 
-            selected_path_length = 10000
-            selected_goal = None
+        selected_path_length = 10000
+        selected_goal = None
 
-            for y in range(size_y):
-                for x in range(size_x):
-                    symbol = self.game_map[y][x]
-                    if symbol == ObjectSymbols.BASE:
-                        goal = (y, x)
-                        path = nx.astar_path(graph, start, goal)
-                        length = len(path)
-                        if length < selected_path_length:
-                            selected_path_length = length
-                            selected_goal = (y, x)
-            return selected_goal
+        for y in range(size_y):
+            for x in range(size_x):
+                symbol = self.game_map[y][x]
+                if symbol == ObjectSymbols.BASE:
+                    goal = (y, x)
+                    path = nx.astar_path(graph, start, goal)
+                    length = len(path)
+                    if length < selected_path_length:
+                        selected_path_length = length
+                        selected_goal = (y, x)
+        return selected_goal
 
 
     def get_closest_material_goal(self, start):

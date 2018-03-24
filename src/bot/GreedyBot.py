@@ -20,7 +20,7 @@ class GreedyBot(Bot):
             if distanceToHome == 1:
                 return self.commands.store()
             else:
-                return self.commands.move(self.pathfinder.get_next_direction(self.character_state['location'], self.character_state['base']))
+                return self.commands.move(self.pathfinder.get_next_direction_safe(self.character_state['location'], self.character_state['base']))
 
         if goal:
             direction = self.pathfinder.get_next_direction_safe(self.character_state['location'], goal)
