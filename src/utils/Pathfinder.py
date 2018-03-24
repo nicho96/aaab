@@ -30,11 +30,24 @@ class Pathfinder:
 
         return direction
 
+    def get_next_direction_safe(self, start, goal):
+        self.start = start
+        self.goal = goal
+        graph = self.create_graph_safe(self.game_map)
+        path = astar_path(graph, start, goal)
+        direction = self.convert_node_to_direction(path)
+
+        return direction
+
     def get_length_of_path(self, start, goal):
         graph = self.create_graph(self.game_map)
         path = nx.astar_path(graph, start, goal)
         return len(path)
 
+    def get_length_of_path_safe(self, start, goal):
+        graph = self.create_graph_safe(self.game_map)
+        path = nx.astar_path(graph, start, goal)
+        return len(path)
 
     def get_homebase_goal(self, start):
         graph = self.create_graph(self.game_map)
@@ -56,9 +69,49 @@ class Pathfinder:
                         selected_goal = (y, x)
         return selected_goal
 
+        def get_homebase_goal_safe(self, start):
+            graph = self.create_graph_safe(self.game_map)
+            size_x = len(self.game_map[0])
+            size_y = len(self.game_map)
+
+            selected_path_length = 10000
+            selected_goal = None
+
+            for y in range(size_y):
+                for x in range(size_x):
+                    symbol = self.game_map[y][x]
+                    if symbol == ObjectSymbols.BASE:
+                        goal = (y, x)
+                        path = nx.astar_path(graph, start, goal)
+                        length = len(path)
+                        if length < selected_path_length:
+                            selected_path_length = length
+                            selected_goal = (y, x)
+            return selected_goal
+
 
     def get_closest_material_goal(self, start):
         graph = self.create_graph(self.game_map)
+        size_x = len(self.game_map[0])
+        size_y = len(self.game_map)
+
+        selected_path_length = 10000
+        selected_goal = None
+
+        for y in range(size_y):
+            for x in range(size_x):
+                symbol = self.game_map[y][x]
+                if symbol == ObjectSymbols.JUNK:
+                    goal = (y, x)
+                    path = nx.astar_path(graph, start, goal)
+                    length = len(path)
+                    if length < selected_path_length:
+                        selected_path_length = length
+                        selected_goal = (y, x)
+        return selected_goal
+
+    def get_closest_material_goal_safe(self, start):
+        graph = self.create_graph_safe(self.game_map)
         size_x = len(self.game_map[0])
         size_y = len(self.game_map)
 
@@ -117,6 +170,30 @@ class Pathfinder:
                     bottom_symbol = game_map[y + 1][x]
                     if bottom_symbol.can_pass_through() or self._is_start_or_goal((y+1, x)):
                         graph.add_edge((y, x), (y+1, x))
+
+        return graph
+
+    def create_graph_safe(self, game_map):
+        graph = nx.Graph()
+        size_x = len(game_map[0])
+        size_y = len(game_map)
+
+        for y in range(size_y):
+            for x in range(size_x):
+                graph.add_node((y, x))
+
+        for y in range(size_y - 1):
+            for x in range(size_x - 1):
+                symbol = game_map[y][x]
+                if symbol != ObjectSymbols.SPIKE and (symbol.can_pass_through() or self._is_start_or_goal((y, x))):
+
+                    right_symbol = game_map[y][x + 1]
+                    if right_symbol != ObjectSymbols.SPIKE and (right_symbol.can_pass_through() or self._is_start_or_goal((y, x + 1))):
+                        graph.add_edge((y, x), (y, x + 1))
+
+                    bottom_symbol = game_map[y + 1][x]
+                    if bottom_symbol != ObjectSymbols.SPIKE and (bottom_symbol.can_pass_through() or self._is_start_or_goal((y + 1, x))):
+                        graph.add_edge((y, x), (y + 1, x))
 
         return graph
 
