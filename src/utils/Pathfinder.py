@@ -27,7 +27,28 @@ class Pathfinder:
         graph = self.create_graph(self.game_map)
         path = astar_path(graph, start, goal)
         direction = self.convert_node_to_direction(path)
+
         return direction
+
+    def get_closest_material_goal(self, start):
+        graph = self.create_graph(self.game_map)
+        size_x = len(self.game_map[0])
+        size_y = len(self.game_map)
+
+        selected_path_length = 10000
+        selected_goal = None
+
+        for y in range(size_y):
+            for x in range(size_x):
+                symbol = self.game_map[y][x]
+                if symbol == ObjectSymbols.JUNK:
+                    goal = (y, x)
+                    path = nx.astar_path(graph, start, goal)
+                    length = len(path)
+                    if length < selected_path_length:
+                        selected_path_length = length
+                        selected_goal = (y, x)
+        return selected_goal
 
     @staticmethod
     def convert_node_to_direction(path):
@@ -61,6 +82,7 @@ class Pathfinder:
             for x in range(size_x - 1):
                 symbol = game_map[y][x]
                 if symbol.can_pass_through() or self._is_start_or_goal((y, x)):
+
                     right_symbol = game_map[y][x + 1]
                     if right_symbol.can_pass_through() or self._is_start_or_goal((y, x+1)):
                         graph.add_edge((y, x), (y, x+1))
@@ -103,4 +125,3 @@ class Pathfinder:
                 game_map[y].append(self.create_symbol(character))
                 x += 1
         return game_map
-
