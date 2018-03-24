@@ -30,6 +30,33 @@ class Pathfinder:
 
         return direction
 
+    def get_length_of_path(self, start, goal):
+        graph = self.create_graph(self.game_map)
+        path = nx.astar_path(graph, start, goal)
+        return len(path)
+
+
+    def get_homebase_goal(self, start):
+        graph = self.create_graph(self.game_map)
+        size_x = len(self.game_map[0])
+        size_y = len(self.game_map)
+
+        selected_path_length = 10000
+        selected_goal = None
+
+        for y in range(size_y):
+            for x in range(size_x):
+                symbol = self.game_map[y][x]
+                if symbol == ObjectSymbols.BASE:
+                    goal = (y, x)
+                    path = nx.astar_path(graph, start, goal)
+                    length = len(path)
+                    if length < selected_path_length:
+                        selected_path_length = length
+                        selected_goal = (y, x)
+        return selected_goal
+
+
     def get_closest_material_goal(self, start):
         graph = self.create_graph(self.game_map)
         size_x = len(self.game_map[0])
